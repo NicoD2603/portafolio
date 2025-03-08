@@ -1,0 +1,28 @@
+.task-item-container {
+  background-color: inherit;
+  border-bottom: 1px solid black;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+.task-details {
+  display: flex;
+  flex-direction: column;
+  .task-description-btns {
+    display: flex;
+    justify-content: space-between;
+    .delete-btn {
+      padding: 10px 20px;
+      border: none;
+      background-color: #f44336;
+      color: white;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    .delete-btn:hover {
+      background: #da190b;
+    }
+  }
+}
+.task-item-container:hover {
+  filter: brightness(0.85);
+}

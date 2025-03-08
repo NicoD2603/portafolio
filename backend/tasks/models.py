@@ -2,9 +2,9 @@ from django.db import models
 
 class Tasks(models.Model):
     status_choice = [
-        ('pending', 'Pendiente'),
-        ('in_progress', 'En Proceso'),
-        ('completed', 'Completada'),       
+        ('pending', 'Pending'),
+        ('in-progress', 'In Progress'),
+        ('completed', 'Completed'),
     ]
 
     title = models.CharField(max_length=200)
@@ -18,3 +18,4 @@ class Tasks(models.Model):
 
     def __str__(self):
         return self.title
+
