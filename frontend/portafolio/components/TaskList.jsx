@@ -4,20 +4,62 @@ import "@/styles/taskList.scss";
 import TaskItem from "./TaskItem";
 import { useState } from "react";
 import TaskForm from "./TaskForm";
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-const TaskList = ({ tasks, status, onTaskDeleted }) => {
+const TaskList = ({ tasks, status, onTaskDeleted, onTaskUpdated }) => {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const [formAddOpen, setFormAddOpen] = useState(false);
 
-  const OpenCloseForm = () => {
-    setFormAddOpen(!formAddOpen);
+  const OpenCloseForm = () => setFormAddOpen((prev) => !prev);
+
+  const deleteTask = async (taskId) => {
+    try {
+      const response = await fetch(`${API_URL}/task/${taskId}/`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        onTaskDeleted(taskId);
+      } else {
+        console.error("Error al eliminar la tarea:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error de red al eliminar la tarea:", error);
+    }
   };
+
+  const updateTask = async (updatedTask) => {
+    try {
+      const response = await fetch(`${API_URL}/task/${updatedTask.id}/`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedTask),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        onTaskUpdated(data);
+      } else {
+        console.error("Error al actualizar la tarea:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error de red al actualizar la tarea:", error);
+    }
+  };
+
   return (
     <div className="task-list">
       {tasks
         .filter((task) => task.status === status)
         .map((task) => (
-          <TaskItem key={task.id} task={task} onTaskDeleted={onTaskDeleted}/>
+          <TaskItem
+            key={task.id}
+            task={task}
+            onDeleteTask={deleteTask}
+            onUpdateTask={updateTask}
+            onOpenCloseForm={OpenCloseForm}
+          />
         ))}
       {status === "pending" && (
         <div className="add-task-btn" onClick={OpenCloseForm}>
@@ -30,7 +72,9 @@ const TaskList = ({ tasks, status, onTaskDeleted }) => {
           </svg>
         </div>
       )}
-      {formAddOpen && <TaskForm OpenCloseForm={OpenCloseForm} />}
+      {formAddOpen && (
+        <TaskForm isOpen={formAddOpen} OpenCloseForm={OpenCloseForm} />
+      )}
     </div>
   );
 };

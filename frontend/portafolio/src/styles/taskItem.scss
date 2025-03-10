@@ -10,6 +10,14 @@
   .task-description-btns {
     display: flex;
     justify-content: space-between;
+    .edit-btn {
+      background-color: #007bff;
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      color: white;
+    }
     .delete-btn {
       padding: 10px 20px;
       border: none;
@@ -18,11 +26,12 @@
       cursor: pointer;
       border-radius: 5px;
     }
+    .edit-btn:hover {
+      background: #0b7dda;
+    }
     .delete-btn:hover {
       background: #da190b;
     }
   }
 }
-.task-item-container:hover {
-  filter: brightness(0.85);
-}
+

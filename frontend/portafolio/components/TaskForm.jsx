@@ -1,53 +1,33 @@
 "use client";
 
-import "../src/styles/TaskForm.scss";
-import { useRef, useState, useEffect } from "react";
+import "@/styles/TaskForm.scss";
+import { useState, useEffect } from "react";
 
-const TaskForm = ({ OpenCloseForm, taskToEdit = null, onTaskSaved }) => {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [status, setStatus] = useState("pending");
-  const [isActive, setIsActive] = useState(false);
+const TaskForm = ({ OpenCloseForm, isOpen, onTaskSaved, task = null }) => {
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
-  const didMount = useRef(false);
+
+  const [title, setTitle] = useState(task?.title || "");
+  const [description, setDescription] = useState(task?.description || "");
+  const [status, setStatus] = useState(task?.status || "pending");
 
   useEffect(() => {
-    if (!didMount.current) {
-      didMount.current = true;
-      return;
+    if (task) {
+      setTitle(task.title);
+      setDescription(task.description);
+      setStatus(task.status);
     }
-    console.log("taskToEdit actualizado:", taskToEdit);
-  }, [taskToEdit]);
+  }, [task]);
 
-  useEffect(() => {
-    if (taskToEdit) {
-      setTitle(taskToEdit.title);
-      setDescription(taskToEdit.description);
-      setStatus(taskToEdit.status);
-    } else {
-      setTitle("");
-      setDescription("");
-      setStatus("pending");
-    }
-    setTimeout(() => setIsActive(true), 10);
-
-    return () => setIsActive(false);
-  }, [taskToEdit]);
-
-  useEffect(() => {
-    console.log("taskToEdit actualizado:", taskToEdit);
-  }, [taskToEdit]);
-
-  const handleSubmit = async (e) => {
+  const Submit = async (e) => {
     e.preventDefault();
 
     const taskData = { title, description, status };
 
     try {
       const response = await fetch(
-        taskToEdit ? `${API_URL}/task/${taskToEdit.id}/` : `${API_URL}/task/`,
+        `${API_URL}/task/${task ? task.id + "/" : ""}`,
         {
-          method: taskToEdit ? "PUT" : "POST",
+          method: task ? "PATCH" : "POST",
           headers: {
             "content-type": "application/json",
           },
@@ -59,9 +39,9 @@ const TaskForm = ({ OpenCloseForm, taskToEdit = null, onTaskSaved }) => {
         throw new Error(`Error: ${response.status}`);
       }
 
-      if (onTaskSaved) {
-        onTaskSaved();
-      }
+      const updatedTask = await response.json();
+
+      if (onTaskSaved) onTaskSaved(updatedTask);
       OpenCloseForm();
     } catch (error) {
       console.error("error al guardar la tarea: ", error);
@@ -70,12 +50,12 @@ const TaskForm = ({ OpenCloseForm, taskToEdit = null, onTaskSaved }) => {
 
   return (
     <div
-      className={`task-form-container ${taskToEdit ? "active" : ""}`}
+      className={`task-form-container ${isOpen ? "active" : ""}`}
       onClick={OpenCloseForm}
     >
       <div className="task-form" onClick={(e) => e.stopPropagation()}>
-        <h3>{taskToEdit ? "Edit Task" : "Add New Task"}</h3>
-        <form className="fields-add-form" onSubmit={handleSubmit}>
+        <h3>{task ? "Edit Task" : "Add New Task"}</h3>
+        <form className="fields-add-form" onSubmit={Submit}>
           <div className="title-new-task">
             <label>Title</label>
             <input
@@ -109,9 +89,10 @@ const TaskForm = ({ OpenCloseForm, taskToEdit = null, onTaskSaved }) => {
             </div>
             <div
               className="confirm-btn"
+              type="submit"
               onClick={(e) => e.currentTarget.closest("form").requestSubmit()}
             >
-              {taskToEdit ? "Update" : "Confirm"}
+              {task ? "Update" : "Confirm"}
             </div>
           </div>
         </form>

@@ -1,4 +1,4 @@
-#!/home/nicolas/Desktop/mine/projects/python/portafolio/entorno/bin/python3
+#!/home/nicolas/Desktop/mine/projects/python/portafolio/backend/entorno/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys
